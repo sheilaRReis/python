@@ -11,13 +11,12 @@ def bar_calculator():
             print("Valor inválido! Tente novamente")
             valid_input = False
         else:
-            input_conta += float(input_tip * input_conta)
-            print(input_tip)
-            print(input_conta)
-            print(result)
+            input_tip = input_tip/100
+            input_conta = float(input_conta + (input_tip * input_conta))
             result = input_conta / input_share
+
             # ???? Notação {:.2f} como fazer esta formatação numa f string[print(f"texto")] ????
-            print("Valor da conta + gorjeta de {:.0f} = R${:.2f}".format(input_tip,input_conta))
+            print("Valor da conta + gorjeta de {:.0}% = R${:.2f}".format(input_tip,input_conta))
             print("Dividindo por {} pessoa(s), num custo de: R${:.2f} por pessoa ".format(input_share, result))
 
 bar_calculator()
