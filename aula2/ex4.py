@@ -5,9 +5,6 @@
 #  O programa deve devolver o faturamento líquido da empresa
 
 
-from xmlrpc.client import INVALID_METHOD_PARAMS
-
-
 invalidInput = True
 
 print("========= Calculadora Financeira =========")

@@ -15,7 +15,7 @@ def share_bet() :
     # dict_players        = dict()
 
     while quit_count < 3 :
-        user_input_quit = print("Cadastre os jogadores: ")
+        print("Cadastre os jogadores: ")
 
         while not name_input_invalid and quit_count < 3 :
             try:
@@ -36,6 +36,7 @@ def share_bet() :
                             player_bet_value      = input_user_bet
                             list_players[0].append(player_name)
                             list_players[1].append(player_bet_value)
+                            
                             # ??? Como salvar no dictionary?
                             # dict_players = {"nome": {player_name}, "bet_value" : {player_bet_value}}
                             print(f"O cadastro do jogador {player_name} foi efetuado com sucesso!")
@@ -52,10 +53,9 @@ def share_bet() :
                     print('Favor informar um valor válido da aposta!')
             except ValueError:
                 print("Nome inválido! Favor tentar novamente!")
-                valid_input = False
         
     if list_players :
-        total           = 0
+        total_bet       = 0
         user_percent    = 0
         user_bet        = 0
         user_share      = 0
@@ -63,12 +63,12 @@ def share_bet() :
         print(f"Jogadores cadastrados: ")
 
         for count in range(3):
-            total+= float(list_players[1][count])
+            total_bet+= float(list_players[1][count])
         
         for i in range(3) :
             user_bet = list_players[1][i]
-            # calcular porcentagem de cada usuário, e multiplicar pelo premio
-            user_percent = ( user_bet / total ) 
+            # calcular porcentagem de cada usuário, para dividir o premio
+            user_percent = ( user_bet / total_bet ) 
             user_share = user_percent * total_prize
             list_players[2].append(user_percent * 100)
             list_players[3].append(user_share)
@@ -81,5 +81,8 @@ def share_bet() :
 
         print("O jogador {} fez uma aposta de R${:.2f}, o que corresponde a {:.2f} % do total".format(player_name, player_bet, player_percent))
         print("Portanto, {} tem direito a R${:.2f} do prêmio".format(player_name, player_share))
+
+    for l in list_players:
+        print(len(l))
 
 share_bet()

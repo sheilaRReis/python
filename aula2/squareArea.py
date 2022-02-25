@@ -8,7 +8,7 @@ while not valid_input :
         print("Valor inválido! Tente novamente")
         valid_input = False
     else:
-        print(f"Área = {square_input*2} cm²")
+        print(f"Área = {pow(square_input,2)} cm²")
         print(f"Perímetro = {square_input*4} cm²")
         valid_input = True
 

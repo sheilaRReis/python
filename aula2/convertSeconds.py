@@ -3,13 +3,16 @@ valid_input = False
 while not valid_input :
 
     try:
-        seg_input = float(input("Informe um valor em segundos: ").strip().replace(",", "."))
+        seconds = int(input("Informe um valor em segundos: ").strip().replace(",", "."))
     except ValueError:
         print("Valor inválido! Tente novamente")
         valid_input = False
     else:
-        min_input = seg_input/60
-        hour_input = min_input/60
-        print("{:.2f} segundos equivalem a: {:.2f} minutos, ou {:.2f} hora(s)".format(seg_input, min_input, hour_input))
+        minutes = int(seconds/60)
+        hours = int(minutes/60)
+
+        remaining_minutes = (seconds/60-minutes) * 60
+        remaining_seconds = (minutes/60-hours) * 60
+        print("{} segundos equivalem a: {} minutos, ou {} hora(s)".format(seconds, minutes, hours))
 
         valid_input = True
