@@ -12,7 +12,7 @@ def share_bet() :
     player_bet_value    = 0
     total_prize         = 1000000
     list_players        = [ list(), list(), list(), list() ]
-    # dict_players        = dict()
+    dict_players        = dict()
 
     while quit_count < 3 :
         print("Cadastre os jogadores: ")
@@ -38,7 +38,8 @@ def share_bet() :
                             list_players[1].append(player_bet_value)
                             
                             # ??? Como salvar no dictionary?
-                            # dict_players = {"nome": {player_name}, "bet_value" : {player_bet_value}}
+                            # dict_aux = {"nome": player_name, "bet_value" : player_bet_value}
+                            # dict_players.update(dict_aux)
                             print(f"O cadastro do jogador {player_name} foi efetuado com sucesso!")
 
                             #Incrementa o contador, e reseta variáveis de validação dos inputs
@@ -81,8 +82,5 @@ def share_bet() :
 
         print("O jogador {} fez uma aposta de R${:.2f}, o que corresponde a {:.2f} % do total".format(player_name, player_bet, player_percent))
         print("Portanto, {} tem direito a R${:.2f} do prêmio".format(player_name, player_share))
-
-    for l in list_players:
-        print(len(l))
 
 share_bet()

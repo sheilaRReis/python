@@ -368,7 +368,8 @@ weight = [52.4, 65, 70, 50]
 # Calculando o IMC de todos os elementos da lista dá erro
 # imc = weight / height ** 2
 # -------------------------------------------------------------------------------------------------
-#       Para fazer calculos numa lista inteira, temos que usar numPy array, do pacote NumPy                         
+#       Para fazer calculos numa lista inteira, temos que usar numPy array, do pacote NumPy    
+#    numpy array contem apenas um tipo de dados.                     
 # -------------------------------------------------------------------------------------------------
 # import numpy as np
 # np_height = np.array(height)
