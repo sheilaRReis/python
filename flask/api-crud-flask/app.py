@@ -1,4 +1,5 @@
 # Tutorial CRUD COMPLETO FLASK com SQLALCHEMY em Python - API REST e BANCO DE DADOS 2021
+# Testes feitos no Postman
 # Disponível em: https://www.youtube.com/watch?v=WDpPGFkI9UU&t=651s
 #   Flask -> cria rotas da API
 #   Response -> usada para criar o retorno da API
