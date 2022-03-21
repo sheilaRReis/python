@@ -7,9 +7,8 @@ while not invalid_input:
         input_v2 = int(input("Digite o 2º valor: "))
         input_v3 = int(input("Digite o 3º valor: "))
     except ValueError:
-        print("Valor inválido! Tente novamente")
-        valid_input = False
+        print("Valor inválido!")
+        invalid_input = True
     else:
-        valid_input = True
         sum = input_v1 + input_v2 + input_v3
-        print(f" {input_v1} + {input_v2} + {input_v3} é igual a {sum}")
+        print(f"{input_v1} + {input_v2} + {input_v3} é igual a {sum}")
