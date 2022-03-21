@@ -43,20 +43,21 @@ def readUsersFile():
 
     sum = calcSum(list_space=list_space_MB)
     
-    i=0
-    for i in range(len(list_space_MB)):
-        percent_used = list_space_MB[i]*100 / sum
-        list_percent_used.append(format(percent_used, '.2f'))
-
+    list_percent_used = calcPercentUsed(list_space=list_space_MB, sum=sum)
+    
     writeReportFile(sum, list_space_MB, list_users, list_percent_used)
     
-  
+def calcPercentUsed(list_space, sum):
+    for i in range(len(list_space)):
+        percent_used = list_space[i]*100 / sum
+        list_percent_used.append(format(percent_used, '.2f'))
+    return list_percent_used
 def calcSum(list_space):
     sum = 0
     for i in range(len(list_space_MB)):
         sum += list_space_MB[i]
     return sum
-    
+
 def writeReportFile(sum, list_space, list_users, list_percent_used):
     list_file_lines.append("ACME Inc.               Uso do espaço em disco pelos usuários\n")
     list_file_lines.append("------------------------------------------------------------------------\n")
@@ -65,9 +66,9 @@ def writeReportFile(sum, list_space, list_users, list_percent_used):
         space_MB = format(list_space[i], '.2f')
         line = str(f"{i+1}    {list_users[i]}      {space_MB} MB           {list_percent_used[i]}%\n")
         list_file_lines.append(line)
-    list_file_lines.append("Espaço total ocupado: {:.2f} \n".format(sum))
-    list_file_lines.append("Espaço médio ocupado: {:.2f} \n".format(sum/len(list_users)))
-    report_file = open("./exerciciosLista/relatório.txt","w",encoding='utf-8')
+    list_file_lines.append("\nEspaço total ocupado: {:.2f} MB\n".format(sum))
+    list_file_lines.append("Espaço médio ocupado: {:.2f} MB\n".format(sum/len(list_users)))
+    report_file = open("./exerciciosLista/relatorio.txt","w",encoding='utf-8')
     
     for linha in list_file_lines:
         report_file.write(linha)
