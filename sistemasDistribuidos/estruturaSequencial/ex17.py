@@ -30,11 +30,11 @@ while(mixed_cans_liters > 18):
 while(mixed_cans_liters > 0):
     mixed_cans_gallons += 1
     mixed_cans_liters-= 3.6
-print(f"Comprando apenas latas de 18 litros, será necessário comprar: {num_18l_cans} unidades")
-print(f"Comprando galões de 3.6 litros, será necessário comprar: {num_gallons} unidades")
-if (mixed_cans_18l or mixed_cans_gallons):
+print(f"Comprando apenas latas de 18 litros, será necessário comprar: {num_18l_cans} unidade(s), no valor de R${num_18l_cans*80}")
+print(f"Comprando galões de 3.6 litros, será necessário comprar: {num_gallons} unidade(s), no valor de R${num_gallons*25}")
+if (mixed_cans_18l > 0  or mixed_cans_gallons > 0):
     print(f"Comprando galões de 3.6 litros e latas de 18 litros, será necessário comprar: ", end="")
     if(mixed_cans_18l > 0):
-        print(f"\n{mixed_cans_18l} lata(s) de 18 litros", end="")
+        print(f"\n{mixed_cans_18l} lata(s) de 18 litros, no valor de R${mixed_cans_18l*80}", end="")
     if(mixed_cans_gallons > 0):
-        print(f"\n{mixed_cans_gallons} lata(s) de 3.6 litros")
+        print(f"\n{mixed_cans_gallons} lata(s) de 3.6 litros, no valor de R${mixed_cans_gallons*25}")
