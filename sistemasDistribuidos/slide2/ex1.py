@@ -16,7 +16,7 @@ invalidInput = True
 fileName     = ''
 while(invalidInput):
     fileName     = input("Digite o nome do arquivo: ").strip()
-    searchWord   = input("Digite a palavra que deseja procurar no arquivo: ").strip()
+    searchWord   = input("Digite a palavra que deseja procurar no arquivo: ").strip().casefold()
     if(len(fileName)<1):
         print("Favor informar o nome do arquivo")
         invalidInput = True
@@ -31,7 +31,7 @@ if len(fileName)>0:
     linhas     = file.readlines()
     listLinhas = list()
     for linha in linhas:
-        if(searchWord in linha):    
+        if(searchWord in linha.casefold()):    
             listLinhas.append(linha)
 
     report_file = open("{}FIND_{}".format(absolutePath, fileName),"w",encoding='utf-8')
