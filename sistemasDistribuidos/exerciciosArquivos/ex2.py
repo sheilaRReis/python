@@ -34,7 +34,7 @@ list_percent_used = list()
 list_file_lines   = list()
 avarage_space     = 0
 def readUsersFile():
-    arq               = open("./exerciciosLista/usuarios.txt")
+    arq               = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/usuarios.txt")
     linhas            = arq.readlines()
 
     for linha in linhas:
@@ -68,7 +68,7 @@ def writeReportFile(sum, list_space, list_users, list_percent_used):
         list_file_lines.append(line)
     list_file_lines.append("\nEspaço total ocupado: {:.2f} MB\n".format(sum))
     list_file_lines.append("Espaço médio ocupado: {:.2f} MB\n".format(sum/len(list_users)))
-    report_file = open("./exerciciosLista/relatorio.txt","w",encoding='utf-8')
+    report_file = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/relatorio.txt","w",encoding='utf-8')
     
     for linha in list_file_lines:
         report_file.write(linha)

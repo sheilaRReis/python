@@ -3,8 +3,7 @@
 # Um endereço IPv4 possui o formato x.x.x.x, em que x é chamado de octeto e deve ser um valor decimal entre 0 e 255. 
 # Os octetos são separados por pontos. Um endereço IPv4 deve conter três pontos e quatro octetos.
 
-# IPfile     = open("./exerciciosArquivos/ips.txt")
-IPfile     = open("./ips.txt")
+IPfile     = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/ips.txt")
 linhas     = IPfile.readlines()
 listIPs    = list()
 validIPs   = list()
@@ -35,8 +34,7 @@ for ip_str in listIPs:
     else:
         invalidIPs.append(ip_str)
 
-# report_file = open("./exerciciosArquivos/ex1.py","w",encoding='utf-8')
-report_file     = open("./ipsReport.txt","w",encoding='utf-8')
+report_file     = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/ipsReport.txt","w",encoding='utf-8')
 list_file_lines = list()
 list_file_lines.append("[Endereços válidos:]\n")
 for ip in validIPs:
