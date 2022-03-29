@@ -36,7 +36,7 @@ avarage_space     = 0
 def readUsersFile():
     arq               = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/usuarios.txt")
     linhas            = arq.readlines()
-
+    arq.close()
     for linha in linhas:
         list_users.append(linha[:15]) # pega do 1º ao 15º caracter
         list_space_MB.append(float(int(linha[16:].replace("\n",""))/1000000)) # pega do 16º ao fim da string
@@ -72,4 +72,5 @@ def writeReportFile(sum, list_space, list_users, list_percent_used):
     
     for linha in list_file_lines:
         report_file.write(linha)
+    report_file.close()
 readUsersFile()

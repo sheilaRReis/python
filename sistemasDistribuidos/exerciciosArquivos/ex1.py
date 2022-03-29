@@ -5,6 +5,7 @@
 
 IPfile     = open("C:/Users/Sheila/dev/cursoExtensao_Python/python/sistemasDistribuidos/exerciciosArquivos/ips.txt")
 linhas     = IPfile.readlines()
+IPfile.close()
 listIPs    = list()
 validIPs   = list()
 invalidIPs = list()
@@ -46,3 +47,5 @@ for ip in invalidIPs:
 
 for linha in list_file_lines:
     report_file.write(linha)
+
+report_file.close()

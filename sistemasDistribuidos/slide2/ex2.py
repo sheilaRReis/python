@@ -47,6 +47,7 @@ if len(absolutePath)>0:
                         continue
                     if not error_flag:
                         linhas     = file.readlines()
+                        file.close()
                         countLines = 0
                         for linha in linhas:
                             linha = linha.replace("\n","")
@@ -58,3 +59,4 @@ if len(absolutePath)>0:
 
         for linha in listLinhas:
             report_file.write(linha)
+        report_file.close()

@@ -29,6 +29,7 @@ while(invalidInput):
 if len(fileName)>0:
     file       = open("{}{}".format(absolutePath,fileName))
     linhas     = file.readlines()
+    file.close()
     listLinhas = list()
     for linha in linhas:
         if(searchWord in linha.casefold()):    
@@ -38,3 +39,4 @@ if len(fileName)>0:
         
     for linha in listLinhas:
         report_file.write(linha)
+    report_file.close()

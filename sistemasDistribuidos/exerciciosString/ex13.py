@@ -6,6 +6,7 @@ import random
 
 words_file  = open("words.txt")
 linhas      = words_file.readlines()
+words_file.close()
 list_words  = list()
 
 for linha in linhas:
