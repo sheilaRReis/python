@@ -1,8 +1,7 @@
-from email import message
-from math import prod
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Resource, Api, abort, fields, marshal_with, reqparse
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,9 +25,10 @@ product_update_args.add_argument("ganhopercentual", type=float)
 resource_fields = {
     'idproduto' : fields.Integer,
     'descricao' : fields.String,
-    'ganhopercentual' : fields.Float
+    'ganhopercentual' : fields.Float,
+    # URI incompleta, add idproduto
+    'uri' : fields.Url('produtos')
 }
-
 
 class ProdutosList(Resource):
     def get(self):
@@ -37,6 +37,20 @@ class ProdutosList(Resource):
         for produto in produtos:
             produtosList[produto.idproduto] = {"descricao" : produto.descricao, "ganhopercentual": produto.ganhopercentual}
         return produtosList
+        
+    # Como deixar post disponivel na classe Produto?
+    @marshal_with(resource_fields)
+    def post(self):
+        args = product_post_args.parse_args()
+        produto = ProdutoModel(descricao=args['descricao'], ganhopercentual=args['ganhopercentual'])
+        db.session.add(produto)
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            abort(404)
+
+        return produto,201
+
 
 class Produtos(Resource):
     @marshal_with(resource_fields)
@@ -46,13 +60,6 @@ class Produtos(Resource):
             abort(404, message='Não foi possível encontrar o produto')
         return produto
 
-    @marshal_with(resource_fields)
-    def post(self):
-        args = product_post_args.parse_args()
-        produto = ProdutoModel(descricao=args['descricao'], ganhopercentual=args['ganhopercentual'])
-        db.session.add(produto)
-        db.session.commit()
-        return produto,201
 
     @marshal_with(resource_fields)
     def put(self, product_id):
@@ -64,16 +71,22 @@ class Produtos(Resource):
             produto.descricao =  args['descricao']
         if args['ganhopercentual']:
             produto.ganhopercentual =  args['ganhopercentual']
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            abort(404)
+
         return produto
 
     def delete(self, product_id):
         produto = ProdutoModel.query.filter_by(idproduto=product_id).first()
+        if not produto:
+            abort(404, message='Produto não encontrado')
         db.session.delete(produto)
         return 'Produto excluído com sucesso! ', 204
         
-api.add_resource(Produtos, '/api-loja/produtos/<int:product_id>')
-api.add_resource(ProdutosList, '/api-loja/produtos')
+api.add_resource(Produtos, '/api-loja/produtos/<int:product_id>', endpoint='produto')
+api.add_resource(ProdutosList, '/api-loja/produtos', endpoint='produtos')
 
 if __name__ == '__main__':
     app.run(debug=True) 
