@@ -1,5 +1,4 @@
-from email import message
-from flask import Flask, jsonify
+from flask import Flask
 from flask_restful import Resource, Api, abort, fields, marshal_with, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
@@ -52,19 +51,20 @@ testRecordPostArgs.add_argument("status", type=str, help="O campo status deve se
 testRecordPostArgs.add_argument("date", type=str, help="A data deve ser informada", required=True)
 testRecordPostArgs.add_argument("record", type=str,  required=False)
 testRecordPostArgs.add_argument("template", type=str,  required=False)
-testRecordPostArgs.add_argument("device_serial_number", type=str, required=False)
+testRecordPostArgs.add_argument("device_serial_number", type=str, help="O campo device_serial_number é obrigatório!", required=True)
 testRecordPostArgs.add_argument("device_model", type=str,  required=False)
 testRecordPostArgs.add_argument("mti_test_instrument", type=str,  required=False)
 testRecordPostArgs.add_argument("mti_serial_number", type=str,  required=False)
 testRecordPostArgs.add_argument("mti_firmware_version", type=str,  required=False)
-# testRecordPostArgs.add_argument("testResults", type=TestResultModel,  required=False)
+testRecordPostArgs.add_argument("testResults", type=str,  required=False)
+
 
 testRecordUpdateArgs = reqparse.RequestParser()
 testRecordUpdateArgs.add_argument("status", type=str, help="O campo status deve ser informado", required=True)
 testRecordUpdateArgs.add_argument("date", type=str, help="A data deve ser informada", required=True)
 testRecordUpdateArgs.add_argument("record", type=str,  required=False)
 testRecordUpdateArgs.add_argument("template", type=str,  required=False)
-testRecordUpdateArgs.add_argument("device_serial_number",  required=False)
+testRecordUpdateArgs.add_argument("device_serial_number", type=str, help="O campo device_serial_number é obrigatório!", required=True)
 testRecordUpdateArgs.add_argument("device_model", type=str,  required=False)
 testRecordUpdateArgs.add_argument("mti_test_instrument", type=str,  required=False)
 testRecordUpdateArgs.add_argument("mti_serial_number", type=str, required=False)
@@ -79,7 +79,6 @@ testResultItem_resource_fields = {
     'high_limit' : fields.Float,
     'low_limit' : fields.Float,
     'standard' : fields.String,
-
 }
 
 testResult_resource_fields = {
@@ -88,8 +87,8 @@ testResult_resource_fields = {
     'test_type'   : fields.String,
     'procedure' : fields.String,
     'testResultItems' : fields.List(fields.Nested(testResultItem_resource_fields)),
-
 }
+
 
 testRecord_resource_fields = {
     'test_record_id' : fields.Integer,
@@ -106,7 +105,6 @@ testRecord_resource_fields = {
     'uri' : fields.Url('TestRecords', absolute=True) ,
 }
 
-
 class EquipamentosAPI(Resource):
     @marshal_with(testRecord_resource_fields)
     def get(self, test_record_id):
@@ -114,12 +112,12 @@ class EquipamentosAPI(Resource):
         if(test_record_id==0):
             testRecords = TestRecordModel.query.all()
             return testRecords
-
         else:
             testRecord = TestRecordModel.query.filter_by(test_record_id=test_record_id).first()
             if not testRecord:
-                abort(404, message='Não foi possível encontrar o TestRecord')
-            return testRecord
+                abort(404, error=True, message=('Não foi possível encontrar TestRecord com id = {}').format(test_record_id))
+            else:
+                return testRecord
 
 
     @marshal_with(testRecord_resource_fields)
@@ -127,7 +125,7 @@ class EquipamentosAPI(Resource):
         args = testRecordUpdateArgs.parse_args()
         testRecord = TestRecordModel.query.filter_by(test_record_id=test_record_id).first()
         if not testRecord:
-            abort(404, message='testRecord não encontrado')
+            abort(404, error=True, message=('Não foi possível encontrar TestRecord com id = {}').format(test_record_id))
         else:
             if args['status']:
                 testRecord.status =  args['status']
@@ -140,10 +138,11 @@ class EquipamentosAPI(Resource):
             testRecord.mti_test_instrument =  args['mti_test_instrument']
             testRecord.mti_serial_number =  args['mti_serial_number']
             testRecord.mti_firmware_version =  args['mti_firmware_version']
+
             try:
                 db.session.commit()
             except SQLAlchemyError as e:
-                abort(404)
+                abort(404, message = e)
 
         return testRecord
 
@@ -165,6 +164,7 @@ class EquipamentoAPI(Resource):
     @marshal_with(testRecord_resource_fields)
     def post(self):
         args = testRecordPostArgs.parse_args()
+            
         testRecord = TestRecordModel(status=args['status'], date=args['date'], record=args['record'], 
                                 template=args['template'], device_serial_number=args['device_serial_number'], 
                                 device_model=args['device_model'], mti_test_instrument = args['mti_test_instrument'],
