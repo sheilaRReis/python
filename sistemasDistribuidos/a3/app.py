@@ -12,40 +12,6 @@ api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = ('sqlite:///prolifeequipmentdb.db')
 db = SQLAlchemy(app)
 
-class TestRecordModel(db.Model):
-    __tablename__ = 'TestRecord'
-    test_record_id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String)
-    date = db.Column(db.String)
-    record = db.Column(db.String)
-    template = db.Column(db.String)
-    device_serial_number = db.Column(db.String)
-    device_model = db.Column(db.String)
-    mti_test_instrument = db.Column(db.String)
-    mti_serial_number = db.Column(db.String)
-    mti_firmware_version = db.Column(db.String)
-    testResults = relationship("TestResultModel", cascade="all, delete")
-    
-class TestResultModel(db.Model):
-    __tablename__ = "TestResult"
-    test_result_id = db.Column(db.Integer, primary_key=True)
-    test_record_id = db.Column(db.Integer, ForeignKey("TestRecord.test_record_id", ondelete="CASCADE"))
-    test_element = db.Column(db.String)
-    test_type = db.Column(db.String)
-    procedure = db.Column(db.String)
-    testResultItems = relationship("TestResultItemModel", cascade="all, delete")
-
-class TestResultItemModel(db.Model):
-    __tablename__ = "TestResultItem"
-    test_result_item_id = db.Column(db.Integer, primary_key=True)
-    test_result_id = db.Column(db.Integer, ForeignKey("TestResult.test_result_id", ondelete="CASCADE"))
-    result = db.Column(db.String)
-    value = db.Column(db.Float)
-    unit = db.Column(db.String)
-    high_limit = db.Column(db.Float)
-    low_limit = db.Column(db.Float)
-    standard = db.Column(db.String)
-
 
 testRecordArgs = reqparse.RequestParser()
 testRecordArgs.add_argument("status", type=str, help="O campo status deve ser informado", required=True)
@@ -112,6 +78,42 @@ testRecord_resource_fields = {
     'testResults' : fields.List(fields.Nested(testResult_resource_fields)),
     'uri' : fields.Url('TestRecords', absolute=True) ,
 }
+
+
+
+class TestRecordModel(db.Model):
+    __tablename__ = 'TestRecord'
+    test_record_id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String)
+    date = db.Column(db.String)
+    record = db.Column(db.String)
+    template = db.Column(db.String)
+    device_serial_number = db.Column(db.String)
+    device_model = db.Column(db.String)
+    mti_test_instrument = db.Column(db.String)
+    mti_serial_number = db.Column(db.String)
+    mti_firmware_version = db.Column(db.String)
+    testResults = relationship("TestResultModel", cascade="all, delete")
+    
+class TestResultModel(db.Model):
+    __tablename__ = "TestResult"
+    test_result_id = db.Column(db.Integer, primary_key=True)
+    test_record_id = db.Column(db.Integer, ForeignKey("TestRecord.test_record_id", ondelete="CASCADE"))
+    test_element = db.Column(db.String)
+    test_type = db.Column(db.String)
+    procedure = db.Column(db.String)
+    testResultItems = relationship("TestResultItemModel", cascade="all, delete")
+
+class TestResultItemModel(db.Model):
+    __tablename__ = "TestResultItem"
+    test_result_item_id = db.Column(db.Integer, primary_key=True)
+    test_result_id = db.Column(db.Integer, ForeignKey("TestResult.test_result_id", ondelete="CASCADE"))
+    result = db.Column(db.String)
+    value = db.Column(db.Float)
+    unit = db.Column(db.String)
+    high_limit = db.Column(db.Float)
+    low_limit = db.Column(db.Float)
+    standard = db.Column(db.String)
 
 class TestResultsAPI(Resource):
     @marshal_with(testResult_resource_fields)
