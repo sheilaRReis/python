@@ -35,7 +35,6 @@ class TestResultModel(db.Model):
     procedure = db.Column(db.String)
     testResultItems = relationship("TestResultItemModel", cascade="all, delete")
 
-	    
 class TestResultItemModel(db.Model):
     __tablename__ = "TestResultItem"
     test_result_item_id = db.Column(db.Integer, primary_key=True)
@@ -63,15 +62,15 @@ testRecordArgs.add_argument("testResultItems", type=str,  required=False)
 
 testResultArgs = reqparse.RequestParser()
 testResultArgs.add_argument("test_record_id", type=str, help='O campo test_record_id deve ser informado',required=True)
-testResultArgs.add_argument("test_element", type=str,help='O campo test_element deve ser informado', required=True)
+testResultArgs.add_argument("test_element", type=str, required=False)
 testResultArgs.add_argument("test_type", type=str, required=False)
 testResultArgs.add_argument("procedure", type=str, required=False)
 testResultArgs.add_argument("testResultItems", type=str, required=False)
 
 testResultItemArgs = reqparse.RequestParser()
-testResultItemArgs.add_argument("test_result_id", required=False)
-testResultItemArgs.add_argument("result", type=str, help='O campo result deve ser informado',required=True)
-testResultItemArgs.add_argument("value", type=str, help='O campo value deve ser informado',required=True)
+testResultItemArgs.add_argument("test_result_id",  type=str, help='O campo test_result_id deve ser informado',required=True)
+testResultItemArgs.add_argument("result", type=str, required=False)
+testResultItemArgs.add_argument("value", type=str, required=False)
 testResultItemArgs.add_argument("unit", type=str, required=False)
 testResultItemArgs.add_argument("high_limit", type=str, required=False)
 testResultItemArgs.add_argument("low_limit", type=str, required=False)
@@ -120,38 +119,48 @@ class TestResultsAPI(Resource):
         test_result_id = int(test_result_id)
         if(test_result_id==0):
             testResults = TestResultModel.query.all()
+            if not testResults:
+                # Se o recurso não puder ser encontrado, o método deve retornar 404 (Não encontrado)
+                abort(404, error=True, message=('Não existem registros de TestResult'))
         else:
             testResults = TestResultModel.query.filter_by(test_result_id=test_result_id).all()
+            if not testResults:
+                # Se o recurso não puder ser encontrado, o método deve retornar 404 (Não encontrado)
+                abort(404, error=True, message=('Não foi possível encontrar TestResult com id = {}').format(test_result_id))
 
-        if not testResults:
-            # Se o recurso não puder ser encontrado, o método deve retornar 404 (Não encontrado)
-            abort(404, error=True, message=('Não foi possível encontrar TestResult com id = {}').format(test_result_id))
-        else:
-            # Um método GET bem-sucedido retorna o código de status HTTP 200(OK).
-            return testResults, 200
+        # Um método GET bem-sucedido retorna o código de status HTTP 200(OK).
+        return testResults, 200
 
     @marshal_with(testResult_resource_fields)
     def put(self, test_result_id):
         args = testResultArgs.parse_args()
         testResult = TestResultModel.query.filter_by(test_result_id=test_result_id).first()
         if not testResult:
-            #  Se o método atualiza um recurso existente, retorna 200 (OK) ou 204 (Sem conteúdo).
-            abort(404, error=True, message=('Não foi possível encontrar TestResult com id = {}').format(test_result_id))
+            abort(409, error=True, message=('Não foi possível encontrar TestResult com id = {}').format(test_result_id))
         else:
-            testResult.test_element =  args['test_element']
-            testResult.test_type =  args['test_type']
-            testResult.procedure =  args['procedure']
-            try:
-                db.session.commit()
-            except SQLAlchemyError as e:
-                db.session.rollback()
-                abort(204, error=True,message = e)
-                                            
+            if args['test_record_id']!="":
+                testRecordId = int(args['test_record_id'])
+                if(testRecordId==0):
+                    abort(409, error=True, message=('Não foi possível encontrar um registro de TestRecord associado ao id = {}').format(test_result_id))
+                else:
+                    testRecord = TestRecordModel.query.filter_by(test_record_id=testRecordId).first()
+                    if(testRecord):
+                        testResult.test_record_id = testRecordId            
+                        testResult.test_element =  args['test_element']
+                        testResult.test_type =  args['test_type']
+                        testResult.procedure =  args['procedure']
+                        try:
+                            db.session.commit()
+                        except SQLAlchemyError as e:
+                            db.session.rollback()
+                            abort(204, error=True,message = e)
+                    else:
+                        abort(409, error=True, message=('O valor de test_record_id é inválido. Não foi possível encontrar um registro de TestRecord associado ao id = {}').format(test_result_id))
+                                           
             if("testResultItems" in args and str(args['testResultItems'])!="None"):
                 tritemString = args['testResultItems'].replace("'",'"')
                 testResultItems = json.loads(tritemString)
                 if('test_result_item_id' in testResultItems):
-                    # for tri in testResultItems:
                     test_result_item_id = testResultItems['test_result_item_id']
                     if(test_result_item_id):
                         testResultItem = TestResultItemModel.query.filter_by(test_result_item_id = test_result_item_id).first()
@@ -231,6 +240,9 @@ class TestResultItemsAPI(Resource):
         test_result_item_id = int(test_result_item_id)
         if(test_result_item_id==0):
             testResultItems = TestResultItemModel.query.all()
+            if not testResultItems:
+                # Se o recurso não puder ser encontrado, o método deve retornar 404 (Não encontrado)
+                abort(404, error=True, message=('Não existem registros de TestResultItem'))
         else:
             testResultItems = TestResultItemModel.query.filter_by(test_result_item_id=test_result_item_id).first()
 
@@ -303,9 +315,9 @@ class TestResultItemAPI(Resource):
     @marshal_with(testResultItem_resource_fields)
     def post(self):
         args = testResultItemArgs.parse_args()
-        if('test_result_id' in args and args['test_result_id']!="None"):
+        if('test_result_id' in args and args['test_result_id']!=""):
             testResultId = int(args['test_result_id'])
-            if(testResultId and testResultId!=0):
+            if(testResultId!=0):
                 testResult = TestResultModel.query.filter_by(test_result_id=testResultId).first()
                 if not testResult:
                     # Dados inválidos na solicitação, retornar o código de status HTTP 400 (Solicitação incorreta)
@@ -327,8 +339,6 @@ class TestResultItemAPI(Resource):
                         return testResultItem, 201
             else:
                 abort(400, error=True, message=('Você informou um valor inválido para test_result_id.'))
-
-
 
 class EquipamentosAPI(Resource):
     @marshal_with(testRecord_resource_fields)
@@ -356,18 +366,28 @@ class EquipamentosAPI(Resource):
             #  Se o método atualiza um recurso existente, retorna 200 (OK) ou 204 (Sem conteúdo).
             abort(204, error=True, message=("Não foi possível encontrar TestRecord com id = {}").format(test_record_id))
         else:
-            testRecord.status =  args['status']
-            testRecord.date =  args['date']
-            testRecord.record =  args['record']
-            testRecord.template =  args['template']
-            testRecord.device_serial_number =  args['device_serial_number']
-            testRecord.device_model =  args['device_model']
-            testRecord.mti_test_instrument =  args['mti_test_instrument']
-            testRecord.mti_serial_number =  args['mti_serial_number']
-            testRecord.mti_firmware_version =  args['mti_firmware_version']
+            if args['status']!=None and args['status']!="":
+                testRecord.status =  args['status']
+            if args['date']!=None and args['date']!="":
+                testRecord.date =  args['date']
+            if args['device_serial_number']!=None and args['device_serial_number']!="":
+                testRecord.device_serial_number =  args['device_serial_number']
+            if args['record']!=None:
+                testRecord.record =  args['record']
+            if args['template']!=None:
+                testRecord.template =  args['template']
+            if args['device_model']!=None:
+                testRecord.device_model =  args['device_model']
+            if args['mti_test_instrument']!=None:
+                testRecord.mti_test_instrument =  args['mti_test_instrument']
+            if args['mti_serial_number']!=None:
+                testRecord.mti_serial_number =  args['mti_serial_number']
+            if args['mti_firmware_version']!=None:
+                testRecord.mti_firmware_version =  args['mti_firmware_version']
             try:
                 db.session.commit()
             except SQLAlchemyError as e:
+                db.session.rollback()
                 abort(204, error=True, message=e)
                         
             if('testResults' in args and str(args['testResults'])!="None"):
@@ -418,7 +438,6 @@ class EquipamentosAPI(Resource):
             else:
                 # Se a exclusão for bem-sucedida, responder com código HTTP 204 
                 return  "TestRecord excluído com sucesso! ", 204
-
 
 class EquipamentoAPI(Resource):
 
